@@ -1,0 +1,13 @@
+{
+  "author": "Oliver Pope",
+  "name": "improved-release-radar",
+  "description": "Web app to provide a better release radar for Spotify",
+  "version": "1.0.0",
+  "dependencies": {
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.4",
+    "express": "~4.16.0",
+    "querystring": "~0.2.0",
+    "request": "~2.83.0"
+  }
+}

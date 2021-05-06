@@ -1,0 +1,184 @@
+<!doctype html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="icon" href="icon.ico" />
+
+    <title>Improved Release Radar</title>
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="stylesheet.css">
+  </head>
+
+  <body>
+    <div id="topNavbar" class="topnav">
+      <ul>
+        <li><a onclick="openNav()">Nav</a></li>
+        <li style="float:right"><a href="#" onclick="logout()">Logout</a></li>
+        <li style="float:right"><a onclick="setFilters()">Set Filters</a></li>
+        <li style="float:right"><a onclick="saveFilters()">Save Filters</a></li>
+        <li style="float:right"><a onclick="loadFilters()">Load Filters</a></li>
+      </ul>
+    </div>
+    <div id="sideNavbar" class="sidenav">
+      <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+      <a onclick="showProfile()">Profile</a>
+      <a onclick="showFollowedArtists()">Followed Artists</a>
+      <a onclick="showNewAlbums()">New Albums</a>
+      <a onclick="showNewSingles()">New Singles</a>
+      <a onclick="showNewReleases()">New Releases</a>
+      <a onclick="showFilteredReleaseRadar()">Filtered Release Radar</a>
+    </div>
+    <div class="container-fluid">
+      <div id="login">
+        <h1>Improved Release Radar</h1>
+        <a href="/login" class="btn btn-primary">Log in with Spotify</a>
+      </div>
+      <div id="loggedin">
+        <div id="user-profile">
+        </div>
+        <div id="oauth">
+        </div>
+        <div id="followedartistslist">
+          <table class="paginated table table-striped" id="artiststable">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Image</th>
+                <th>Include In Release Radar?</th>
+              </tr>
+            </thead>
+            <tbody id="followedartists" class="list">
+            </tbody>
+          </table>
+        </div>
+        <div id="newalbumsdiv">
+          <table class="paginated table table-striped">
+            <thead>
+              <tr>
+                <th>Artist</th>
+                <th>Album</th>
+              </tr>
+            </thead>
+            <tbody id="newalbums" class="list">
+            </tbody>
+          </table>
+        </div>
+        <div id="newsinglesdiv">
+          <table class="paginated table table-striped">
+            <thead>
+              <tr>
+                <th>Artist</th>
+                <th>Single</th>
+              </tr>
+            </thead>
+            <tbody id="newsingles" class="list">
+            </tbody>
+          </table>
+        </div>
+        <div id="newreleasesdiv">
+          <table class="paginated table table-striped">
+            <thead>
+              <tr>
+                <th>Artist</th>
+                <th>Track</th>
+              </tr>
+            </thead>
+            <tbody id="newreleases" class="list">
+            </tbody>
+          </table>
+        </div>
+        <div id="filtereddiv">
+          <table class="paginated table table-striped">
+            <thead>
+              <tr>
+                <th>Artist</th>
+                <th>Track</th>
+              </tr>
+            </thead>
+            <tbody id="filteredtracks" class="list">
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <script id="user-profile-template" type="text/x-handlebars-template">
+      <h1>Logged in as {{display_name}}</h1>
+      <div class="media">
+        <div class="pull-left">
+          <img class="media-object" width="150" src="{{images.0.url}}" />
+        </div>
+        <div class="media-body">
+          <dl class="dl-horizontal">
+            <dt>Display name</dt><dd class="clearfix">{{display_name}}</dd>
+            <dt>Id</dt><dd>{{id}}</dd>
+            <dt>Email</dt><dd>{{email}}</dd>
+            <dt>Spotify URI</dt><dd><a href="{{external_urls.spotify}}">{{external_urls.spotify}}</a></dd>
+            <dt>Link</dt><dd><a href="{{href}}">{{href}}</a></dd>
+            <dt>Profile Image</dt><dd class="clearfix"><a href="{{images.0.url}}">{{images.0.url}}</a></dd>
+            <dt>Country</dt><dd>{{country}}</dd>
+          </dl>
+        </div>
+      </div>
+    </script>
+
+    <script id="oauth-template" type="text/x-handlebars-template">
+      <h2>oAuth info</h2>
+      <dl class="dl-horizontal">
+        <dt>Access token</dt><dd class="text-overflow">{{access_token}}</dd>
+        <dt>Refresh token</dt><dd class="text-overflow">{{refresh_token}}</dd>
+      </dl>
+    </script>
+
+    <script id="followed-artists-template" type="text/x-handlebars-template">
+        {{#each artists}}
+        <tr>
+          <td>{{name}}</td>
+          <td><img src={{images.0.url}} id="followedartistsimage"></img></td>
+          <td><input id={{id}} type="checkbox" checked></input></td>
+        </tr>
+        {{/each}}
+    </script>
+
+    <script id="new-albums-template" type="text/x-handlebars-template">
+      {{#each albums}}
+      <tr>
+        <td><a href={{artists.0.external_urls.spotify}}>{{artists.0.name}}</a></td>
+        <td><a href={{external_urls.spotify}}>{{name}}</a></td>
+      </tr>
+      {{/each}}
+    </script>
+
+    <script id="new-singles-template" type="text/x-handlebars-template">
+      {{#each singles}}
+      <tr>
+        <td><a href={{artists.0.external_urls.spotify}}>{{artists.0.name}}</a></td>
+        <td><a href={{external_urls.spotify}}>{{name}}</a></td>
+      </tr>
+      {{/each}}
+    </script>
+
+    <script id="new-releases-template" type="text/x-handlebars-template">
+      {{#each releases}}
+      <tr>
+        <td><a href={{artists.0.external_urls.spotify}}>{{artists.0.name}}</a></td>
+        <td><a href={{external_urls.spotify}}>{{name}}</a></td>
+      </tr>
+      {{/each}}
+    </script>
+
+    <script id="filtered-releases-template" type="text/x-handlebars-template">
+      {{#each releases}}
+      <tr>
+        <td><a href={{artists.0.external_urls.spotify}}>{{artists.0.name}}</a></td>
+        <td><a href={{external_urls.spotify}}>{{name}}</a></td>
+      </tr>
+      {{/each}}
+    </script>
+
+    <script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/2.0.0-alpha.1/handlebars.min.js"></script>
+    <script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+    <script  src="/index.js"></script>
+    <script  src="/filter.js"></script>
+  </body>
+</html>
