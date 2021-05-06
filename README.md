@@ -1,2 +1,2 @@
 # ImprovedReleaseRadar
-Node JS app to create better release radar for spotify
+Node JS app to create a better release radar for spotify
